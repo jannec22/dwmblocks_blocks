@@ -16,7 +16,7 @@ prevdata="$(cat "$logfile")" || echo "0 0" > "$logfile"
 rxcurrent="$(($(paste -d '+' /sys/class/net/[ew]*/statistics/rx_bytes)))"
 txcurrent="$(($(paste -d '+' /sys/class/net/[ew]*/statistics/tx_bytes)))"
 
-printf "🔻%sKiB 🔺%sKiB\\n" \
+printf "🔻%4dKiB 🔺%4dKiB\\n" \
 	"$(((rxcurrent-${prevdata%% *})/1024))" \
 	"$(((txcurrent-${prevdata##* })/1024))"
 
