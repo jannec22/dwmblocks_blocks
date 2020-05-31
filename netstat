@@ -1,0 +1,3 @@
+#!/bin/sh
+
+printf "%s" "$(vnstat -m | tail -n1 | awk '{print $2$3}')"

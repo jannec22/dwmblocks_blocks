@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Prints all batteries, their percentage remaining and an emoji corresponding
+# to charge status (🔌 for plugged up, 🔋 for discharging on battery, etc.).
+
+echo "$BLOCK_BUTTON" > /tmp/blockbutton
+
+case $BLOCK_BUTTON in
+    111) notify-send "🔋 Battery module" "🔋: discharging
+🛑: not charging
+♻: stagnant charge
+🔌: charging
+⚡: charged
+❗: battery very low!" ;;
+esac
+
+# Loop through all attached batteries.
+for battery in /sys/class/power_supply/BAT?
+do
+	# Get its remaining capacity and charge status.
+	capacity=$(cat "$battery"/capacity) || break
+	rawstatus=$(sed "s/Discharging/d/;s/Not charging/n/;s/Charging/c/;s/Unknown/u/;s/Full/f/" "$battery"/status)
+	laststatus="$(cat /tmp/lastbatterystat)"
+	status=$(sed "s/Discharging//;s/Not charging/-- /;s/Charging/🔌/;s/Unknown/?/;s/Full/=/" "$battery"/status)
+
+	echo "$rawstatus" > "/tmp/lastbatterystat"
+
+	[ "$laststatus" != "c" ] && [ "$rawstatus" = "c" ] && dunstify -a "battery_status" -r "2453453" -u low "CHARGING"
+	[ "$laststatus" = "c" ] && [ "$rawstatus" != "c" ] && dunstify -a "battery_status" -r "2453453" -u low "ON BATTERY"
+
+	# If it is discharging and 25% or less, we will add a ❗ as a warning.
+	 [ "$capacity" -le 25 ] && [ -z "$status" ] && warn="❗"
+	 [ "$capacity" -eq 10 ] && [ -z "$status" ] && dunstify -a "low_battery" -r "2453452" -u critical "❗WARNING❗" "battery is running low ($capacity)%"
+
+	printf "%s%s%s%%" "$status" "$warn" "$capacity"
+	unset warn
+done | sed 's/\ $/\\n/'
