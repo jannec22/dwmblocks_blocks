@@ -7,4 +7,4 @@ layout_file="${XDG_CACHE_HOME:-$HOME/.cache}/barlayout"
 current=0
 [ ! -f "$layout_file" ] && echo "$current" > "$layout_file" || current="$(cat "$layout_file")"
 
-echo "$(sed "$((current + 1))q;d" $signals_file)" | grep -q "$1"
+echo "$(sed "$((current + 1))q;d" $signals_file)" | grep -w -q "$1"

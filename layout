@@ -41,10 +41,12 @@ change(){
 
 layouts(){
     i=0
-    while [ $i -lt ${#layouts[@]} ]; do
+    layouts_count=$(wc -l < $layouts_file)
+
+    while [ $i -le $layouts_count ]; do
         description="$(eval "for word in $(sed "$((i + 1))q;d" $descriptions_file); do echo \$word; done")"
 
-        notify-send -u low "Status bar layout ${layouts[$i]}:
+        notify-send -u low "Status bar layout $(sed "$((current + 1))q;d" $layouts_file):
 $description"
 
         ((i++))
