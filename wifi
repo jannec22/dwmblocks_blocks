@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Show wifi percent strength or nothing if not connected.
+
+case $BLOCK_BUTTON in
+	1) $TERMINAL -e sudo wifi-menu ;;
+	3) notify-send "Wifi module" "\- Click to connect
+    $(grep "up" /sys/class/net/w*/operstate &>/dev/null && echo "wifi up: $(grep "^\s*w" /proc/net/wireless | awk '{ printf "%d%", int($3 * 100 / 70) }')" || echo "no wifi")" ;;
+esac
+
+wifiicon=""
+grep "up" /sys/class/net/w*/operstate &>/dev/null && wifiicon="$(grep "^\s*w" /proc/net/wireless | awk '{ printf "wifi: %d%", int($3 * 100 / 70) }')"
+
+printf "%s" "$wifiicon"
+

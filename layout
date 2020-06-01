@@ -1,0 +1,62 @@
+#!/bin/sh
+default=0
+default_layout=1
+
+layouts_file="${XDG_CONFIG_HOME:-$HOME/.config}/barlayouts_icons"
+signals_file="${XDG_CONFIG_HOME:-$HOME/.config}/barsignals"
+descriptions_file="${XDG_CONFIG_HOME:-$HOME/.config}/bar_layouts_descriptions"
+layout_file="${XDG_CACHE_HOME:-$HOME/.cache}/barlayout"
+
+[ ! -f "$layout_file" ] && echo "$default" > "$layout_file" || current="$(cat "$layout_file")"
+[ -z "$current" ] && current="$default"
+
+[ ! -f "$layouts_file" ] && echo "$default_layout" > "$layouts_file"
+
+block(){
+	printf "%s" "$(sed "$((current + 1))q;d" $layouts_file) "
+}
+
+change(){
+    layouts_count=$(wc -l < $layouts_file)
+    if [ $current -lt $layouts_count ]; then
+        current=$(($current + 1))
+    else
+        current=0
+    fi
+
+    icon="$(sed "$((current + 1))q;d" $layouts_file)"
+    echo "$current" > $layout_file
+    notify-send -u low "changed layout: $icon"
+    
+    signals="$(tr ' ' '\n' < $signals_file | sort -n | uniq)"
+    blockspid=$(pidof dwmblocks)
+
+    for sig in $signals; do
+        # pkill -RTMIN+$sig blocks
+        kill "-$(($sig + 34))" "$blockspid" # faster way ?
+    done
+
+    block
+}
+
+layouts(){
+    i=0
+    while [ $i -lt ${#layouts[@]} ]; do
+        description="$(eval "for word in $(sed "$((i + 1))q;d" $descriptions_file); do echo \$word; done")"
+
+        notify-send -u low "Status bar layout ${layouts[$i]}:
+$description"
+
+        ((i++))
+    done
+}
+
+case $BLOCK_BUTTON in
+	1) change ;;
+	2) layouts ;;
+	3) layouts ;;
+	# 4) change ;;  # scroll up
+	# 5) change ;;  # scroll down
+	6) layouts ; "$TERMINAL" -e "$EDITOR" "$0" ;;
+	*) block ;;
+esac

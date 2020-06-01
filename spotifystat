@@ -1,0 +1,23 @@
+#!/bin/sh
+
+status(){
+    notify-send -u low "$(dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:Metadata | sed -n '/title/{n;p}' | cut -d '"' -f 2)" "\- Shows spotify song playing.
+- Italic when paused.
+- Left click opens ncmpcpp.
+- Middle click pauses.
+- Scroll changes track."
+}
+
+block(){
+	printf "%s" "$(dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:Metadata | sed -n '/title/{n;p}' | cut -d '"' -f 2)"
+}
+
+case $BLOCK_BUTTON in
+	1) status ;;
+	2) dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause ;;
+	3) status ;;
+	4) dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous ;;  # scroll up, previous
+	5) dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next ;;  # scroll down, next
+	6) status ; "$TERMINAL" -e "$EDITOR" "$0" ;;
+	*) block ;;
+esac

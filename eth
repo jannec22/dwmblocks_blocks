@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Shows eth+ if connected to ethernet or nothing if none.
+
+case $BLOCK_BUTTON in
+	# 1) $TERMINAL -e nmtui ;;
+	1) notify-send "🌐 ethernet module" "\- Click to connect
+    $(grep "up" /syclass/net/e*/operstate &>/dev/null && echo "ethernet is up" || echo "no ethernet connection")" ;;
+esac
+
+ethicon=""
+grep "up" /syclass/net/e*/operstate &>/dev/null && ethicon="eth+"
+
+printf "%s" "$ethicon"
+

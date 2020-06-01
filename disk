@@ -3,7 +3,7 @@
 # Status bar module for disk space
 # $1 should be drive mountpoint, otherwise assumed /.
 
-location=${1:-/home/master}
+location=${1:-/home/$USER}
 
 [ -d "$location" ] || exit
 

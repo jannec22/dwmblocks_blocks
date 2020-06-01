@@ -2,7 +2,7 @@
 
 # Module showing network traffic. Shows how much data has been received (RX) or
 # transmitted (TX) since the previous time this script ran. So if run every
-# second, gives network traffic per second.
+# second, gives network traffic per second.q
 
 case "$BLOCK_BUTTON" in
 	3) notify-send "🌐 Network traffic module" "🔻: Traffic received
@@ -16,7 +16,7 @@ prevdata="$(cat "$logfile")" || echo "0 0" > "$logfile"
 rxcurrent="$(($(paste -d '+' /sys/class/net/[ew]*/statistics/rx_bytes)))"
 txcurrent="$(($(paste -d '+' /sys/class/net/[ew]*/statistics/tx_bytes)))"
 
-printf "🔻%4dKiB 🔺%4dKiB\\n" \
+printf "🔻%sKiB 🔺%sKiB\\n" \
 	"$(((rxcurrent-${prevdata%% *})/1024))" \
 	"$(((txcurrent-${prevdata##* })/1024))"
 

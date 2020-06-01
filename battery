@@ -6,12 +6,10 @@
 echo "$BLOCK_BUTTON" > /tmp/blockbutton
 
 case $BLOCK_BUTTON in
-    111) notify-send "🔋 Battery module" "🔋: discharging
-🛑: not charging
-♻: stagnant charge
+    1) notify-send "Battery module" "%: discharging
 🔌: charging
-⚡: charged
-❗: battery very low!" ;;
+=100: charged
+❗: less than 25%" ;;
 esac
 
 # Loop through all attached batteries.
